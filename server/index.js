@@ -41,9 +41,48 @@ app.use((err, req, res, next) => {
 
 async function start() {
   await db.migrate();
+  await maybeSeedAdmin();
   app.listen(PORT, () => {
     console.log(`Blossom Rock Crew App running on http://localhost:${PORT}`);
   });
+}
+
+// Boot-time admin seed (free-plan friendly: no shell needed).
+// If ADMIN_EMAIL + ADMIN_PASSWORD env vars are set and that admin doesn't
+// exist yet, create it (and the Blossom Rock property). Safe to leave the
+// env vars set — it skips anything that already exists. Remove them from
+// the dashboard after the first successful login if you prefer.
+async function maybeSeedAdmin() {
+  const email = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+  const password = process.env.ADMIN_PASSWORD || '';
+  const name = (process.env.ADMIN_NAME || 'Admin').trim();
+  if (!email || !password) return;
+  if (password.length < 8) {
+    console.error('Boot seed skipped: ADMIN_PASSWORD must be at least 8 characters.');
+    return;
+  }
+  try {
+    const { hashPassword } = require('./auth');
+    const existing = await db.get('SELECT id FROM users WHERE email = ?', [email]);
+    if (existing) {
+      console.log(`Boot seed: admin already exists (${email})`);
+    } else {
+      await db.run('INSERT INTO users(email, password_hash, role, name) VALUES(?,?,?,?)', [
+        email, await hashPassword(password), 'admin', name,
+      ]);
+      console.log(`Boot seed: admin created (${email})`);
+    }
+    const prop = await db.get('SELECT id FROM properties WHERE name = ?', ['Blossom Rock']);
+    if (!prop) {
+      await db.run(
+        'INSERT INTO properties(name, city, state, center_lat, center_lng, default_zoom) VALUES(?,?,?,?,?,?)',
+        ['Blossom Rock', 'Apache Junction', 'AZ', 33.4123, -111.5496, 15]
+      );
+      console.log('Boot seed: property created (Blossom Rock)');
+    }
+  } catch (e) {
+    console.error('Boot seed failed:', e.message);
+  }
 }
 
 if (require.main === module) start();
