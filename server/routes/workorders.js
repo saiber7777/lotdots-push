@@ -155,9 +155,10 @@ router.get('/:id/map.png', async (req, res) => {
       mapCache.set(key, await renderWorkOrderMap(items));
     }
     res.set('Content-Type', 'image/png');
-    // Short cache: pins/categories can change; the client adds a cache-buster
-    // via the work order updated_at timestamp.
-    res.set('Cache-Control', 'private, max-age=300');
+    // No browser cache: the server's in-memory mapCache is content-keyed and
+    // fast, so always revalidate. A max-age here would show a stale map for
+    // minutes after pins are added/deleted/recategorized.
+    res.set('Cache-Control', 'no-store');
     res.send(mapCache.get(key));
   } catch (e) {
     console.error('map.png failed:', e.message);
