@@ -44,11 +44,16 @@ async function renderWorkOrderMap(items) {
   const lats = items.map(i => i.lat), lngs = items.map(i => i.lng);
   let minLat = Math.min(...lats), maxLat = Math.max(...lats);
   let minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
-  const padLat = Math.max((maxLat - minLat) * 0.25, 0.004);
-  const padLng = Math.max((maxLng - minLng) * 0.25, 0.004);
+  // Tight padding: keep the map zoomed in close on the pins like the app's
+  // map view, so pins appear in the same spots the user placed them.
+  // 0.0008° ≈ 90m — enough context without losing the location.
+  const padLat = Math.max((maxLat - minLat) * 0.25, 0.0008);
+  const padLng = Math.max((maxLng - minLng) * 0.25, 0.0008);
   minLat -= padLat; maxLat += padLat; minLng -= padLng; maxLng += padLng;
 
-  let z = 18;
+  // Start at z=19 (closest Google satellite zoom) and only zoom out as far
+  // as needed to fit. This matches the app's close-up pin placement view.
+  let z = 19;
   while (z > 10) {
     const w = lonToPx(maxLng, z) - lonToPx(minLng, z);
     const h = latToPy(minLat, z) - latToPy(maxLat, z);
