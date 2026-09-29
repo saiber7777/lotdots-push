@@ -23,7 +23,7 @@ function pinOverlay(item, bb) {
 
 function header(title, date, page, total) {
   return `<div class="wo-header">
-    <div class="wo-brand">Blossom Rock<small>Crew App</small></div>
+    <div class="wo-brand"><img src="/lot-dots-logo.jpg" alt="Lot Dots" class="wo-logo"></div>
     <div class="wo-title"><div class="t">${esc(title)}</div><div class="d">${esc(date)} · Page ${page} of ${total}</div></div>
   </div>`;
 }

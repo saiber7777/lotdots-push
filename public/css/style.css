@@ -163,6 +163,8 @@ a { color: var(--violet); }
 .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
   background: linear-gradient(160deg, var(--indigo-deep) 0%, var(--violet) 70%); }
 .login-card { width: 100%; max-width: 400px; }
+.login-logo { width: 220px; max-width: 80%; height: auto; display: block; margin: 0 auto 4px; }
+.wo-logo { height: 56px; width: auto; display: block; }
 
 table.plain { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 table.plain th, table.plain td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); }
