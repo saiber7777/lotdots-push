@@ -97,7 +97,7 @@ async function renderWorkOrderMap(items) {
     const color = CATEGORY_COLORS[it.category] || CATEGORY_COLORS.other;
     const label = String(it.pin_number ?? '');
     svg += `<g><circle cx="${cx}" cy="${cy}" r="${R}" fill="${color}" stroke="#ffffff" stroke-width="3"/>` +
-      `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-family="system-ui,sans-serif" ` +
+      `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-family="DejaVu Sans, sans-serif" ` +
       `font-size="14" font-weight="800" fill="#ffffff">${label}</text></g>`;
   }
   svg += `</svg>`;

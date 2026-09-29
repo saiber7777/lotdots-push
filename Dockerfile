@@ -1,5 +1,9 @@
 FROM node:20-slim
 
+# Fonts for server-rendered SVG pin labels (sharp/librsvg needs real fonts)
+RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install dependencies first (better layer caching)
