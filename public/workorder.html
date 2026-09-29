@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work order — Blossom Rock Crew App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="topbar no-print">
+  <div class="brand">Blossom Rock<small>Work order</small></div>
+  <div class="spacer"></div>
+  <a href="/app.html" style="color:#fff">← Back to app</a>
+</header>
+
+<div class="wrap">
+  <div class="wo-actions no-print">
+    <button class="btn yellow" id="printBtn">Print / Save as PDF</button>
+    <button class="btn ghost" id="imgBtn">Download page images</button>
+    <span class="hint" id="dlHint"></span>
+  </div>
+  <div id="msg" class="no-print"></div>
+  <div id="pages"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/workorder.js"></script>
+</body>
+</html>

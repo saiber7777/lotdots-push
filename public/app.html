@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blossom Rock Crew App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Blossom Rock<small>Crew App</small></div>
+  <div class="spacer"></div>
+  <div class="who" id="who"></div>
+  <button class="btn small ghost" style="border-color:#fff;color:#fff" id="logoutBtn">Log out</button>
+</header>
+
+<div class="wrap">
+  <div class="toolbar">
+    <label class="hint" for="propSel"><strong>Property:</strong></label>
+    <select id="propSel"></select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="map">Map</button>
+    <button class="tab" data-tab="list">Work list</button>
+    <button class="tab" data-tab="orders">Work orders</button>
+    <button class="tab" data-tab="team" id="teamTab" style="display:none">Team &amp; properties</button>
+  </div>
+
+  <div id="msg"></div>
+
+  <!-- MAP -->
+  <section id="tab-map">
+    <div class="card">
+      <p class="hint" style="margin-top:0">Tap the map to drop a pin where work is needed, then fill in the details.</p>
+      <div id="map"></div>
+    </div>
+    <div class="card" id="pinFormCard" style="display:none">
+      <h3>New work item <span id="pinCoords" class="hint"></span></h3>
+      <div id="pinErr"></div>
+      <form id="pinForm">
+        <div class="field"><label for="fArea">Area</label><select id="fArea"></select></div>
+        <div class="field"><label for="fCat">Category</label><select id="fCat"></select></div>
+        <div class="field"><label for="fNotes">Notes</label><textarea id="fNotes" placeholder="What's wrong? Be specific."></textarea></div>
+        <div class="field"><label for="fPhoto">Photo (optional)</label><input id="fPhoto" type="file" accept="image/*"></div>
+        <div class="toolbar">
+          <button class="btn yellow" type="submit">Save pin</button>
+          <button class="btn ghost" type="button" id="pinCancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- LIST -->
+  <section id="tab-list" style="display:none">
+    <div class="card">
+      <div class="toolbar">
+        <select id="statusFilter">
+          <option value="">All statuses</option>
+          <option value="open">Open</option>
+          <option value="assigned">Assigned</option>
+          <option value="done">Done</option>
+        </select>
+        <span class="hint" id="listCount"></span>
+      </div>
+      <div id="items"></div>
+    </div>
+  </section>
+
+  <!-- WORK ORDERS -->
+  <section id="tab-orders" style="display:none">
+    <div class="card" id="newOrderCard">
+      <h3>New work order</h3>
+      <p class="hint">Creates a clean multi-page work order from the checked open items below.</p>
+      <div class="field"><label for="woTitle">Title</label><input id="woTitle" value="Neighborhood maintenance"></div>
+      <div id="woPick"></div>
+      <button class="btn yellow" id="woCreate">Create work order</button>
+    </div>
+    <div class="card">
+      <h3>Past work orders</h3>
+      <div id="orders"></div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section id="tab-team" style="display:none">
+    <div class="card">
+      <h3>Add team member</h3>
+      <div id="userErr"></div>
+      <form id="userForm">
+        <div class="field"><label for="uName">Name</label><input id="uName" required></div>
+        <div class="field"><label for="uEmail">Email</label><input id="uEmail" type="email" required></div>
+        <div class="field"><label for="uPass">Password (min 8 chars)</label><input id="uPass" type="password" minlength="8" required></div>
+        <div class="field"><label for="uRole">Role</label>
+          <select id="uRole"><option value="crew">Crew</option><option value="supervisor">Supervisor</option><option value="admin">Admin</option></select>
+        </div>
+        <button class="btn" type="submit">Create account</button>
+      </form>
+    </div>
+    <div class="card"><h3>Team</h3><div id="users"></div></div>
+    <div class="card">
+      <h3>Add property</h3>
+      <form id="propForm">
+        <div class="field"><label for="pName">Name</label><input id="pName" required></div>
+        <div class="field"><label for="pCity">City</label><input id="pCity" value="Apache Junction"></div>
+        <div class="field"><label for="pState">State</label><input id="pState" value="AZ"></div>
+        <button class="btn" type="submit">Add property</button>
+      </form>
+    </div>
+  </section>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — Blossom Rock Crew App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="card login-card">
+    <h1 style="font-size:1.7rem">Blossom Rock<br><span style="font-size:1rem;font-family:Inter,sans-serif;font-weight:600;color:var(--muted)">Crew App</span></h1>
+    <p class="hint">Log in with your crew account. Accounts are created by the admin.</p>
+    <div id="err"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn yellow" style="width:100%" type="submit">Log in</button>
+    </form>
+  </div>
+</div>
+<script src="/js/common.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('err');
+  err.innerHTML = '';
+  try {
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      body: { email: document.getElementById('email').value, password: document.getElementById('password').value },
+    });
+    saveSession(data.token, data.user);
+    location.href = '/app.html';
+  } catch (ex) {
+    err.innerHTML = `<div class="error">${esc(ex.message)}</div>`;
+  }
+});
+</script>
+</body>
+</html>

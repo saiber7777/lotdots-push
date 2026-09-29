@@ -1,0 +1,27 @@
+# One-click deploy config for Render (https://render.com).
+# In the Render dashboard: New > Blueprint > point at your GitHub repo.
+services:
+  - type: web
+    name: blossom-rock-crew-app
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/meta
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: blossom-rock-db
+          property: connectionString
+      - key: UPLOAD_DIR
+        value: /app/uploads
+      # NOTE: Render's free plan has ephemeral disk — uploaded photos disappear
+      # on redeploy/restart. For persistent photos, either:
+      #   a) add a persistent disk (needs a paid instance type), or
+      #   b) move uploads to object storage (S3/Cloudflare R2) later.
+      # The app itself and the Postgres data persist fine.
+
+databases:
+  - name: blossom-rock-db
+    plan: free
+    postgresMajorVersion: "16"
