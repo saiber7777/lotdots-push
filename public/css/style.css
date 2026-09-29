@@ -36,18 +36,22 @@ h1, h2, h3, .display {
 a { color: var(--violet); }
 
 .topbar {
-  background: linear-gradient(135deg, var(--indigo-deep), var(--violet));
-  color: #fff;
-  padding: 12px 16px;
+  background: #fff;
+  color: #2b2440;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
   position: sticky;
   top: 0;
   z-index: 500;
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 6px rgba(43, 36, 64, 0.08);
 }
 .topbar .brand { font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.15rem; letter-spacing: 0.02em; }
 .topbar .brand small { display: block; font-family: 'Inter', sans-serif; font-weight: 400; font-size: 0.7rem; opacity: 0.75; letter-spacing: 0.08em; text-transform: uppercase; }
+.topbar-logo { height: 44px; width: auto; display: block; }
+.topbar a { color: var(--violet); font-weight: 600; }
 .topbar .spacer { flex: 1; }
 .topbar .who { font-size: 0.8rem; opacity: 0.85; text-align: right; }
 

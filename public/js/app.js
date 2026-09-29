@@ -1,4 +1,4 @@
-/* Blossom Rock Crew App — main client logic. */
+/* Lot Dots — main client logic. */
 const me = requireLogin();
 let META = { areas: [], categories: [], statuses: [] };
 let properties = [];

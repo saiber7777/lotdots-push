@@ -1,7 +1,7 @@
-# Blossom Rock Crew App
+# Lot Dots
 
-A real multi-user web app for the Blossom Rock porter crew: a shared satellite
-work map, numbered pins with photos, and clean multi-page work orders with
+A real multi-user web app for porter crews: a shared satellite
+work map, numbered color-coded pins with photos, and clean multi-page work orders with
 PDF/image export. Everyone logs in — crew, supervisors, and admins — and all
 data is saved on the server.
 
@@ -68,18 +68,20 @@ Buy one from any registrar (Cloudflare, Namecheap, Porkbun…). Example:
 |---|---|---|
 | App server | `npm start` | Docker container (`Dockerfile`) |
 | Database | SQLite file (`data/app.db`) | Managed Postgres (`DATABASE_URL`) |
-| Photos | `uploads/` folder | `uploads/` folder (see note) |
+| Photos | `uploads/` folder | Object storage when `S3_*` set, else `uploads/` (see note) |
 | Login | email + password, bcrypt hash, JWT | same |
 
 **Postgres swap:** set the `DATABASE_URL` env var and the app uses Postgres
 instead of SQLite — no code changes. All queries use `?` placeholders, which
 the database layer rewrites for Postgres automatically.
 
-**Uploads note:** on Render's free plan, files in `uploads/` disappear when the
+**Uploads note:** on Render, files in `uploads/` disappear when the
 service restarts or redeploys (ephemeral disk). The app and database are fine —
-only uploaded photos are affected. For permanent photo storage, either add a
-Render persistent disk (paid instance) or move uploads to object storage
-(S3/Cloudflare R2) later.
+only uploaded photos are affected. For permanent photo storage, set the `S3_*`
+env vars (see `.env.example`) to use S3-compatible object storage — Cloudflare
+R2 is recommended (free 10 GB, no egress fees). The app uploads resized photos
+to the bucket and serves them from `S3_PUBLIC_URL`; without those vars it falls
+back to local disk.
 
 ## API quick reference
 

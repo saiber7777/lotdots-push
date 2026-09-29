@@ -43,7 +43,7 @@ async function start() {
   await db.migrate();
   await maybeSeedAdmin();
   app.listen(PORT, () => {
-    console.log(`Blossom Rock Crew App running on http://localhost:${PORT}`);
+    console.log(`Lot Dots running on http://localhost:${PORT}`);
   });
 }
 
