@@ -90,10 +90,31 @@ async function renderWorkOrderMap(items) {
   const W = Math.max(1, Math.round(px1 - px0));
   const H = Math.max(1, Math.round(py1 - py0));
   const R = 15; // pin radius in px
+  // Spread out pins that would otherwise stack on top of each other:
+  // offset each new pin along a spiral until it no longer overlaps placed pins.
+  const placed = [];
+  const positions = items.map((it) => {
+    let cx = Math.round(lonToPx(it.lng, z) - px0);
+    let cy = Math.round(latToPy(it.lat, z) - py0);
+    const minDist = R * 2 + 4;
+    let angle = 0.6, radius = 0;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const overlaps = placed.some(
+        (p) => Math.hypot(p.x - cx, p.y - cy) < minDist
+      );
+      if (!overlaps) break;
+      radius += 6;
+      angle += 0.9;
+      cx = Math.round(lonToPx(it.lng, z) - px0 + Math.cos(angle) * radius);
+      cy = Math.round(latToPy(it.lat, z) - py0 + Math.sin(angle) * radius);
+      if (radius > 120) break; // give up spreading, just draw it
+    }
+    placed.push({ x: cx, y: cy });
+    return { it, cx, cy };
+  });
   let svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
-  for (const it of items) {
-    const cx = Math.round(lonToPx(it.lng, z) - px0);
-    const cy = Math.round(latToPy(it.lat, z) - py0);
+  for (const { it, cx, cy } of positions) {
     const color = CATEGORY_COLORS[it.category] || CATEGORY_COLORS.other;
     const label = String(it.pin_number ?? '');
     svg += `<g><circle cx="${cx}" cy="${cy}" r="${R}" fill="${color}" stroke="#ffffff" stroke-width="3"/>` +
