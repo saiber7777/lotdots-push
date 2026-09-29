@@ -136,16 +136,6 @@ function initMap() {
   if (currentProp) map.setView([currentProp.center_lat, currentProp.center_lng], currentProp.default_zoom);
 }
 
-const CATEGORY_COLORS = {
-  'dead plant': '#92400e',     // brown
-  'irrigation leak': '#1d6fd8', // blue
-  'trash': '#525252',           // gray
-  'pressure wash': '#0e7490',   // teal
-  'broken/damaged': '#dc2626',  // red
-  'weeds': '#16a34a',           // green
-  'other': '#7c3aed',           // purple
-};
-
 function pinIcon(item) {
   const color = CATEGORY_COLORS[item.category] || CATEGORY_COLORS.other;
   return L.divIcon({

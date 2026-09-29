@@ -46,4 +46,9 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { hashPassword, checkPassword, signToken, requireAuth, requireRole };
+// Verify a JWT outside of Express middleware (e.g. ?token= for <img> URLs).
+function verifyToken(token) {
+  return jwt.verify(token, JWT_SECRET);
+}
+
+module.exports = { hashPassword, checkPassword, signToken, verifyToken, requireAuth, requireRole };

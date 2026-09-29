@@ -43,6 +43,17 @@ function esc(s) {
 
 function statusPill(s) { return `<span class="pill ${esc(s)}">${esc(s)}</span>`; }
 
+/** Pin colors by work category (shared by the app map and work orders). */
+const CATEGORY_COLORS = {
+  'dead plant': '#92400e',      // brown
+  'irrigation leak': '#1d6fd8', // blue
+  'trash': '#525252',           // gray
+  'pressure wash': '#0e7490',   // teal
+  'broken/damaged': '#dc2626',  // red
+  'weeds': '#16a34a',           // green
+  'other': '#7c3aed',           // purple
+};
+
 function fmtDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
