@@ -267,7 +267,7 @@ async function loadOrders() {
   const orders = (await api(`/api/workorders?property_id=${currentProp.id}`)).work_orders;
   $('orders').innerHTML = orders.length
     ? `<table class="plain"><tr><th>Title</th><th>Items</th><th>Created</th><th></th></tr>${orders.map(o =>
-      `<tr><td>${esc(o.title)}</td><td>${JSON.parse(o.item_ids || '[]').length}</td><td>${fmtDate(o.created_at)}</td><td><a href="/workorder.html?id=${o.id}" target="_blank">Open</a></td></tr>`).join('')}</table>`
+      `<tr><td>${esc(o.title)}</td><td>${o.item_count ?? JSON.parse(o.item_ids || '[]').length}</td><td>${fmtDate(o.created_at)}</td><td><a href="/workorder.html?id=${o.id}" target="_blank">Open</a></td></tr>`).join('')}</table>`
     : '<p class="hint">No work orders yet.</p>';
 }
 

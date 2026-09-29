@@ -19,6 +19,17 @@ const latToPy = (lat, z) => {
 
 const mapCache = new Map(); // sha1(item coords) -> PNG buffer, capped at 50
 
+// Category colors must match public/js/common.js CATEGORY_COLORS
+const CATEGORY_COLORS = {
+  'dead plant': '#92400e',
+  'irrigation leak': '#1d6fd8',
+  'trash': '#525252',
+  'pressure wash': '#0e7490',
+  'broken/damaged': '#dc2626',
+  'weeds': '#16a34a',
+  'other': '#7c3aed',
+};
+
 async function fetchTile(x, y, z) {
   const res = await fetch(TILE_URL(x, y, z), {
     headers: {
@@ -67,12 +78,31 @@ async function renderWorkOrderMap(items) {
     input: t.buf, left: (t.tx - tx0) * TILE, top: (t.ty - ty0) * TILE,
   })));
 
-  return full.extract({
+  const extracted = await full.extract({
     left: Math.round(px0 - tx0 * TILE),
     top: Math.round(py0 - ty0 * TILE),
     width: Math.max(1, Math.round(px1 - px0)),
     height: Math.max(1, Math.round(py1 - py0)),
   }).png().toBuffer();
+
+  // Draw category-colored numbered pins directly into the image so the
+  // map and pins can never drift out of alignment (no client overlay).
+  const W = Math.max(1, Math.round(px1 - px0));
+  const H = Math.max(1, Math.round(py1 - py0));
+  const R = 15; // pin radius in px
+  let svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+  for (const it of items) {
+    const cx = Math.round(lonToPx(it.lng, z) - px0);
+    const cy = Math.round(latToPy(it.lat, z) - py0);
+    const color = CATEGORY_COLORS[it.category] || CATEGORY_COLORS.other;
+    const label = String(it.pin_number ?? '');
+    svg += `<g><circle cx="${cx}" cy="${cy}" r="${R}" fill="${color}" stroke="#ffffff" stroke-width="3"/>` +
+      `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-family="system-ui,sans-serif" ` +
+      `font-size="14" font-weight="800" fill="#ffffff">${label}</text></g>`;
+  }
+  svg += `</svg>`;
+
+  return sharp(extracted).composite([{ input: Buffer.from(svg), top: 0, left: 0 }]).png().toBuffer();
 }
 
 // Static map image for the work order cover. JWT comes via ?token= because
@@ -90,18 +120,23 @@ router.get('/:id/map.png', async (req, res) => {
     const ids = JSON.parse(wo.item_ids || '[]');
     if (!ids.length) return res.status(404).json({ error: 'Work order has no items' });
     const placeholders = ids.map(() => '?').join(',');
-    const items = await db.all(`SELECT lat, lng FROM items WHERE id IN (${placeholders})`, ids);
+    const items = await db.all(
+      `SELECT lat, lng, pin_number, category FROM items WHERE id IN (${placeholders}) ORDER BY pin_number ASC`,
+      ids
+    );
     if (!items.length) return res.status(404).json({ error: 'Work order has no items' });
 
     const key = crypto.createHash('sha1')
-      .update(`${wo.id}:${items.map(i => `${i.lat},${i.lng}`).join('|')}`)
+      .update(`${wo.id}:${items.map(i => `${i.lat},${i.lng},${i.pin_number},${i.category}`).join('|')}`)
       .digest('hex');
     if (!mapCache.has(key)) {
       if (mapCache.size >= 50) mapCache.delete(mapCache.keys().next().value);
       mapCache.set(key, await renderWorkOrderMap(items));
     }
     res.set('Content-Type', 'image/png');
-    res.set('Cache-Control', 'private, max-age=86400');
+    // Short cache: pins/categories can change; the client adds a cache-buster
+    // via the work order updated_at timestamp.
+    res.set('Cache-Control', 'private, max-age=300');
     res.send(mapCache.get(key));
   } catch (e) {
     console.error('map.png failed:', e.message);
@@ -166,6 +201,16 @@ router.get('/', async (req, res) => {
      ${where} ORDER BY w.created_at DESC`,
     params
   );
+  // Report the count of items that actually still exist (pins may have been
+  // deleted after the work order was created).
+  for (const o of orders) {
+    let ids = [];
+    try { ids = JSON.parse(o.item_ids || '[]'); } catch { ids = []; }
+    if (!ids.length) { o.item_count = 0; continue; }
+    const placeholders = ids.map(() => '?').join(',');
+    const row = await db.get(`SELECT COUNT(*) AS c FROM items WHERE id IN (${placeholders})`, ids);
+    o.item_count = row ? row.c : 0;
+  }
   res.json({ work_orders: orders });
 });
 
