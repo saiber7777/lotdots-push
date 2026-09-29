@@ -48,3 +48,33 @@ function fmtDate(iso) {
   const d = new Date(iso);
   return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
+
+/** Shrink a photo to a max-edge JPEG in the browser before upload.
+ *  Keeps uploads small and fast (and sidesteps HEIC/format issues).
+ *  Falls back to the original file if the browser can't decode it. */
+function resizeImageFile(file, maxEdge = 1600) {
+  return new Promise((resolve) => {
+    if (!file || !file.type.startsWith('image/')) { resolve(file); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      try {
+        const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        c.toBlob((blob) => {
+          if (blob) {
+            const base = (file.name || 'photo').replace(/\.[^.]+$/, '') || 'photo';
+            resolve(new File([blob], base + '.jpg', { type: 'image/jpeg' }));
+          } else resolve(file);
+        }, 'image/jpeg', 0.82);
+      } catch { resolve(file); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}

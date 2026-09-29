@@ -52,7 +52,7 @@ async function boot() {
   });
 
   $('statusFilter').onchange = loadItems;
-  $('pinCancel').onclick = () => { $('pinFormCard').style.display = 'none'; pendingLatLng = null; };
+  $('pinCancel').onclick = () => { $('pinForm').reset(); $('pinErr').innerHTML = ''; $('pinFormCard').style.display = 'none'; pendingLatLng = null; };
   $('pinForm').onsubmit = savePin;
   $('userForm').onsubmit = createUser;
   $('propForm').onsubmit = createProperty;
@@ -155,7 +155,7 @@ async function savePin(e) {
     fd.append('lat', pendingLatLng.lat);
     fd.append('lng', pendingLatLng.lng);
     const f = $('fPhoto').files[0];
-    if (f) fd.append('photo', f);
+    if (f) fd.append('photo', await resizeImageFile(f));
     const { item } = await api('/api/items', { method: 'POST', body: fd });
     $('pinForm').reset();
     $('pinFormCard').style.display = 'none';
@@ -216,7 +216,7 @@ async function itemAction(act, id) {
       input.onchange = async () => {
         if (!input.files[0]) return;
         const fd = new FormData();
-        fd.append('proof', input.files[0]);
+        fd.append('proof', await resizeImageFile(input.files[0]));
         await api(`/api/items/${id}/complete`, { method: 'POST', body: fd });
         showMsg('Marked done with photo proof.', 'success');
         await loadItems();
