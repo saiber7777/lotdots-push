@@ -7,6 +7,7 @@ let map = null;
 let markers = [];
 let pendingLatLng = null;
 let allItems = [];
+let meMarker = null;
 let users = [];
 
 const $ = (id) => document.getElementById(id);
@@ -89,6 +90,33 @@ function initMap() {
     $('pinCoords').textContent = `(${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)})`;
     $('pinFormCard').style.display = '';
     $('pinFormCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  // Locate-me button (top-right of the map)
+  const locateCtrl = L.control({ position: 'topright' });
+  locateCtrl.onAdd = function () {
+    const btn = L.DomUtil.create('button', 'locate-btn');
+    btn.type = 'button';
+    btn.title = 'Locate me';
+    btn.setAttribute('aria-label', 'Locate me');
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b2d63" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6" fill="#3b2d63" stroke="none"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></svg>';
+    L.DomEvent.on(btn, 'click', (ev) => {
+      L.DomEvent.stopPropagation(ev);
+      btn.classList.add('locating');
+      map.locate({ setView: true, maxZoom: 17, timeout: 15000 });
+    });
+    L.DomEvent.disableClickPropagation(btn);
+    return btn;
+  };
+  locateCtrl.addTo(map);
+  map.on('locationfound', (e) => {
+    document.querySelectorAll('.locate-btn').forEach(b => b.classList.remove('locating'));
+    if (meMarker) map.removeLayer(meMarker);
+    meMarker = L.circleMarker(e.latlng, { radius: 9, weight: 3, color: '#ffffff', fillColor: '#1d4ed8', fillOpacity: 1 }).addTo(map);
+    meMarker.bindPopup('You are here').openPopup();
+  });
+  map.on('locationerror', () => {
+    document.querySelectorAll('.locate-btn').forEach(b => b.classList.remove('locating'));
+    showMsg('Could not get your location. Allow location access for this site, then try again.');
   });
   if (currentProp) map.setView([currentProp.center_lat, currentProp.center_lng], currentProp.default_zoom);
 }
