@@ -118,13 +118,35 @@ function initMap() {
     document.querySelectorAll('.locate-btn').forEach(b => b.classList.remove('locating'));
     showMsg('Could not get your location. Allow location access for this site, then try again.');
   });
+  // Category color key (tap the header to collapse)
+  const legend = L.control({ position: 'bottomleft' });
+  legend.onAdd = function () {
+    const div = L.DomUtil.create('div', 'map-legend');
+    div.innerHTML = '<strong>Key ▾</strong>' + Object.entries(CATEGORY_COLORS).map(([c, col]) =>
+      `<div class="lg-row"><span class="lg-dot" style="background:${col}"></span>${esc(c)}</div>`).join('');
+    div.querySelector('strong').onclick = () => div.classList.toggle('collapsed');
+    L.DomEvent.disableClickPropagation(div);
+    return div;
+  };
+  legend.addTo(map);
   if (currentProp) map.setView([currentProp.center_lat, currentProp.center_lng], currentProp.default_zoom);
 }
 
+const CATEGORY_COLORS = {
+  'dead plant': '#92400e',     // brown
+  'irrigation leak': '#1d6fd8', // blue
+  'trash': '#525252',           // gray
+  'pressure wash': '#0e7490',   // teal
+  'broken/damaged': '#dc2626',  // red
+  'weeds': '#16a34a',           // green
+  'other': '#7c3aed',           // purple
+};
+
 function pinIcon(item) {
+  const color = CATEGORY_COLORS[item.category] || CATEGORY_COLORS.other;
   return L.divIcon({
     className: '',
-    html: `<div class="pin-badge ${item.status}">${item.pin_number}</div>`,
+    html: `<div class="pin-badge ${item.status}" style="background:${color}">${item.pin_number}</div>`,
     iconSize: [34, 34],
     iconAnchor: [17, 17],
   });
@@ -146,6 +168,10 @@ async function savePin(e) {
   if (!pendingLatLng || !currentProp) return;
   const err = $('pinErr');
   err.innerHTML = '';
+  const saveBtn = $('pinForm').querySelector('[type=submit]');
+  const saveBtnText = saveBtn.textContent;
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
   try {
     const fd = new FormData();
     fd.append('property_id', currentProp.id);
@@ -164,6 +190,9 @@ async function savePin(e) {
     await loadItems();
   } catch (ex) {
     err.innerHTML = `<div class="error">${esc(ex.message)}</div>`;
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = saveBtnText;
   }
 }
 

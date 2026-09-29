@@ -55,6 +55,10 @@ function fmtDate(iso) {
 function resizeImageFile(file, maxEdge = 1600) {
   return new Promise((resolve) => {
     if (!file || !file.type.startsWith('image/')) { resolve(file); return; }
+    let done = false;
+    const finish = (f) => { if (!done) { done = true; clearTimeout(timer); resolve(f); } };
+    // Never hang the save: if the image can't be decoded in 10s, send the original.
+    const timer = setTimeout(() => finish(file), 10000);
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
@@ -69,12 +73,12 @@ function resizeImageFile(file, maxEdge = 1600) {
         c.toBlob((blob) => {
           if (blob) {
             const base = (file.name || 'photo').replace(/\.[^.]+$/, '') || 'photo';
-            resolve(new File([blob], base + '.jpg', { type: 'image/jpeg' }));
-          } else resolve(file);
+            finish(new File([blob], base + '.jpg', { type: 'image/jpeg' }));
+          } else finish(file);
         }, 'image/jpeg', 0.82);
-      } catch { resolve(file); }
+      } catch { finish(file); }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.onerror = () => { URL.revokeObjectURL(url); finish(file); };
     img.src = url;
   });
 }
