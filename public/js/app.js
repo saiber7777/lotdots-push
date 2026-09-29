@@ -81,9 +81,9 @@ async function loadItems() {
 /* ---------------- Map ---------------- */
 function initMap() {
   map = L.map('map').setView([33.4123, -111.5496], 15);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Imagery &copy; Esri',
-    maxZoom: 19,
+  L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    attribution: 'Imagery &copy; Google',
+    maxZoom: 20,
   }).addTo(map);
   map.on('click', (e) => {
     pendingLatLng = e.latlng;
