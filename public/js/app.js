@@ -121,10 +121,14 @@ function initMap() {
   // Category color key (tap the header to collapse)
   const legend = L.control({ position: 'bottomleft' });
   legend.onAdd = function () {
-    const div = L.DomUtil.create('div', 'map-legend');
-    div.innerHTML = '<strong>Key ▾</strong>' + Object.entries(CATEGORY_COLORS).map(([c, col]) =>
+    const div = L.DomUtil.create('div', 'map-legend collapsed');
+    div.innerHTML = '<strong>Key ▸</strong>' + Object.entries(CATEGORY_COLORS).map(([c, col]) =>
       `<div class="lg-row"><span class="lg-dot" style="background:${col}"></span>${esc(c)}</div>`).join('');
-    div.querySelector('strong').onclick = () => div.classList.toggle('collapsed');
+    const header = div.querySelector('strong');
+    header.onclick = () => {
+      const collapsed = div.classList.toggle('collapsed');
+      header.textContent = collapsed ? 'Key ▸' : 'Key ▾';
+    };
     L.DomEvent.disableClickPropagation(div);
     return div;
   };
