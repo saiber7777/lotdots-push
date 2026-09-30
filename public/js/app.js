@@ -220,7 +220,7 @@ function itemActions(it) {
     h += `<button class="btn small yellow" data-act="complete" data-id="${it.id}">Mark done + photo</button>`;
   }
   if (canSup && it.status !== 'open') h += `<button class="btn small ghost" data-act="reopen" data-id="${it.id}">Reopen</button>`;
-  if (canSup) h += `<button class="btn small danger" data-act="del" data-id="${it.id}">Delete</button>`;
+  if (canSup) h += `<button class="btn small" data-act="photo" data-id="${it.id}">📷 Photo</button>`; if (canSup) h += `<button class="btn small danger" data-act="del" data-id="${it.id}">Delete</button>`;
   return h || '<span class="hint">—</span>';
 }
 
@@ -246,7 +246,7 @@ async function itemAction(act, id) {
       };
       input.click();
       return;
-    } else if (act === 'reopen') {
+    } else if (act === 'photo') { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = async () => { if (!input.files[0]) return; const fd = new FormData(); fd.append('photo', await resizeImageFile(input.files[0])); await api(`/api/items/${id}/photo`, { method: 'POST', body: fd }); showMsg('Photo attached.', 'success'); await loadItems(); }; input.click(); return; } else if (act === 'reopen') {
       if (me.role !== 'admin') { showMsg('Only admins can reopen items.'); return; }
       await api(`/api/items/${id}`, { method: 'PATCH', body: { status: 'open', assigned_to: null } });
     } else if (act === 'del') {
