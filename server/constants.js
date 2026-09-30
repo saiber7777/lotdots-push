@@ -12,7 +12,12 @@ const AREAS = [
   'Ruff Ranch Dog Park',
   'Oro Canyon Park',
   'Reavis Run Park',
+  'Treasure Park',
+  'Galena Park',
+  'Sombrero Butte Park',
+  'Fremont Park',
 ];
+
 
 const CATEGORIES = [
   'dead plant',
@@ -24,6 +29,8 @@ const CATEGORIES = [
   'other',
 ];
 
+
 const STATUSES = ['open', 'assigned', 'done'];
+
 
 module.exports = { AREAS, CATEGORIES, STATUSES };
