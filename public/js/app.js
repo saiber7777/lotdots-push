@@ -246,7 +246,7 @@ async function itemAction(act, id) {
       };
       input.click();
       return;
-    } else if (act === 'photo') { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = async () => { if (!input.files[0]) return; const fd = new FormData(); fd.append('photo', await resizeImageFile(input.files[0])); await api(`/api/items/${id}/photo`, { method: 'POST', body: fd }); showMsg('Photo attached.', 'success'); await loadItems(); }; input.click(); return; } else if (act === 'reopen') {
+    } else if (act === 'photo') { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.style.display = 'none'; input.id = 'photo-pick-' + id; document.body.appendChild(input); input.onchange = async () => { if (!input.files[0]) { input.remove(); return; } const fd = new FormData(); fd.append('photo', await resizeImageFile(input.files[0])); await api(`/api/items/${id}/photo`, { method: 'POST', body: fd }); showMsg('Photo attached.', 'success'); await loadItems(); input.remove(); }; input.click(); return; } else if (act === 'reopen') {
       if (me.role !== 'admin') { showMsg('Only admins can reopen items.'); return; }
       await api(`/api/items/${id}`, { method: 'PATCH', body: { status: 'open', assigned_to: null } });
     } else if (act === 'del') {
