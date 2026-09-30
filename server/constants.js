@@ -11,6 +11,7 @@ const AREAS = [
   "Miner's Run Adventure Playground",
   'Ruff Ranch Dog Park',
   'Oro Canyon Park',
+  'Reavis Run Park',
 ];
 
 const CATEGORIES = [
